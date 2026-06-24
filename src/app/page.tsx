@@ -30,6 +30,9 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   
+  // Theme Toggle State
+  const [theme, setTheme] = useState<string>("light");
+  
   // Cart & Toast States
   const [cart, setCart] = useState<{ [id: number]: number }>({});
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
@@ -57,6 +60,28 @@ export default function Home() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Theme Toggling logic
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") || "light";
+    setTheme(savedTheme);
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const handleThemeToggle = () => {
+    const nextTheme = theme === "light" ? "dark" : "light";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    if (nextTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
 
   // Compute Categories Dynamically with strict ordering:
   // All -> Jewelry -> Men's clothing -> Women's clothing -> Electronics
@@ -172,13 +197,15 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col">
+    <div className="relative min-h-screen bg-[#f8fafc] dark:bg-[#08080a] text-slate-900 dark:text-zinc-100 flex flex-col transition-colors duration-300">
       {/* Navigation */}
       <Navbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         cartCount={cartCount}
         onCartClick={() => setIsCartOpen(true)}
+        theme={theme}
+        onThemeToggle={handleThemeToggle}
       />
 
       {/* Hero Banner */}
@@ -189,8 +216,8 @@ export default function Home() {
         
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           
-          {/* Filters Sidebar (Left column on desktop, sticky position) */}
-          <aside className="lg:col-span-1 lg:sticky lg:top-28 lg:h-fit lg:bg-white lg:border lg:border-slate-200/60 lg:rounded-3xl lg:p-6 lg:shadow-sm">
+          {/* Filters Sidebar */}
+          <aside className="lg:col-span-1 lg:sticky lg:top-28 lg:h-fit lg:bg-white lg:dark:bg-zinc-900/60 lg:border lg:border-slate-200/60 lg:dark:border-zinc-800/80 lg:rounded-3xl lg:p-6 lg:shadow-sm">
             {isLoading ? (
               <CategoryFilterSkeleton />
             ) : (
@@ -202,12 +229,12 @@ export default function Home() {
             )}
 
             {/* Premium details block (Desktop only) */}
-            <div className="mt-8 hidden lg:block border-t border-slate-100 pt-5">
-              <div className="flex items-center gap-2 text-blue-600">
+            <div className="mt-8 hidden lg:block border-t border-slate-100 dark:border-zinc-800/60 pt-5">
+              <div className="flex items-center gap-2 text-blue-600 dark:text-blue-450">
                 <SlidersHorizontal className="h-4 w-4" />
                 <span className="text-xs font-bold uppercase tracking-wider font-mono">Premium Services</span>
               </div>
-              <ul className="mt-4 space-y-3 text-xs text-slate-500">
+              <ul className="mt-4 space-y-3 text-xs text-slate-550 dark:text-zinc-400">
                 <li>• Free Worldwide Insured Shipping</li>
                 <li>• 100% Authentic Handpicked Goods</li>
                 <li>• 30-Day Returns & Exchange Policy</li>
@@ -222,10 +249,10 @@ export default function Home() {
             ) : error ? (
               <ErrorView message={error} onRetry={fetchProducts} />
             ) : filteredProducts.length === 0 ? (
-              <div className="rounded-3xl border border-slate-200 bg-white p-16 text-center shadow-sm">
-                <Search className="mx-auto h-12 w-12 text-slate-350" />
-                <h3 className="mt-4 font-serif text-xl font-bold text-slate-800">No results found</h3>
-                <p className="mt-2 text-sm text-slate-450">
+              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-16 text-center shadow-sm">
+                <Search className="mx-auto h-12 w-12 text-slate-350 dark:text-zinc-650" />
+                <h3 className="mt-4 font-serif text-xl font-bold text-slate-800 dark:text-zinc-200">No results found</h3>
+                <p className="mt-2 text-sm text-slate-450 dark:text-zinc-500">
                   No products matched &ldquo;{searchQuery}&rdquo;. Try adjusting your keywords or category filters.
                 </p>
                 <button
@@ -233,7 +260,7 @@ export default function Home() {
                     setSearchQuery("");
                     setSelectedCategory("all");
                   }}
-                  className="mt-5 rounded-full border border-slate-250 bg-slate-50 px-5 py-2 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  className="mt-5 rounded-full border border-slate-250 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/65 px-5 py-2 text-xs font-semibold text-slate-650 dark:text-zinc-450 hover:bg-slate-100 dark:hover:bg-zinc-800"
                 >
                   Clear all filters
                 </button>
@@ -241,10 +268,10 @@ export default function Home() {
             ) : (
               <>
                 {/* Result Info */}
-                <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-3">
-                  <p className="text-sm text-slate-500">
-                    Showing <span className="font-semibold text-slate-800">{Math.min(visibleCount, filteredProducts.length)}</span> of{" "}
-                    <span className="font-semibold text-blue-600">{filteredProducts.length}</span> premium products
+                <div className="mb-6 flex items-center justify-between border-b border-slate-100 dark:border-zinc-800/60 pb-3">
+                  <p className="text-sm text-slate-500 dark:text-zinc-450">
+                    Showing <span className="font-semibold text-slate-800 dark:text-zinc-200">{Math.min(visibleCount, filteredProducts.length)}</span> of{" "}
+                    <span className="font-semibold text-blue-600 dark:text-blue-400">{filteredProducts.length}</span> premium products
                   </p>
                 </div>
 
@@ -265,11 +292,11 @@ export default function Home() {
                   <div className="mt-12 flex flex-col items-center justify-center gap-3">
                     <button
                       onClick={handleLoadMore}
-                      className="rounded-full border border-slate-200 bg-white px-8 py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-300 hover:bg-slate-50 hover:text-slate-900"
+                      className="rounded-full border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 px-8 py-3.5 text-sm font-semibold text-slate-700 dark:text-zinc-350 shadow-sm transition-all duration-300 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-zinc-100"
                     >
                       Load More Products
                     </button>
-                    <span className="text-[10px] text-slate-450 uppercase tracking-widest font-mono font-bold">
+                    <span className="text-[10px] text-slate-450 dark:text-zinc-550 uppercase tracking-widest font-mono font-bold">
                       {filteredProducts.length - visibleCount} products remaining
                     </span>
                   </div>
@@ -282,17 +309,17 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-20 border-t border-slate-200 bg-slate-50 py-10">
+      <footer className="mt-20 border-t border-slate-200 dark:border-zinc-900/80 bg-slate-50 dark:bg-zinc-950/40 py-10">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-zinc-500">
             &copy; {new Date().getFullYear()} PREMIUM SHOP. Created as a technical evaluation. All rights reserved.
           </p>
-          <div className="mt-4 flex justify-center gap-6 text-[10px] uppercase tracking-wider text-slate-400 font-mono">
-            <a href="#" className="hover:text-slate-600">Privacy Policy</a>
+          <div className="mt-4 flex justify-center gap-6 text-[10px] uppercase tracking-wider text-slate-400 dark:text-zinc-550 font-mono">
+            <a href="#" className="hover:text-slate-600 dark:hover:text-zinc-400">Privacy Policy</a>
             <span>•</span>
-            <a href="#" className="hover:text-slate-600">Terms of Service</a>
+            <a href="#" className="hover:text-slate-650 dark:hover:text-zinc-400">Terms of Service</a>
             <span>•</span>
-            <a href="https://fakestoreapi.com" target="_blank" rel="noopener noreferrer" className="hover:text-slate-600">API Provider</a>
+            <a href="https://fakestoreapi.com" target="_blank" rel="noopener noreferrer" className="hover:text-slate-650 dark:hover:text-zinc-400">API Provider</a>
           </div>
         </div>
       </footer>
@@ -332,16 +359,16 @@ export default function Home() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8, y: -20 }}
               transition={{ type: "spring", stiffness: 350, damping: 25 }}
-              className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-lg shadow-slate-200/50"
+              className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-lg shadow-slate-200/50 dark:shadow-zinc-950/80"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400">
                 <ShoppingBag className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-slate-800">
+                <p className="text-xs font-semibold text-slate-800 dark:text-zinc-200">
                   {toast.message}
                 </p>
-                <p className="mt-1 truncate text-[11px] leading-tight text-slate-500">
+                <p className="mt-1 truncate text-[11px] leading-tight text-slate-550 dark:text-zinc-405">
                   {toast.productName}
                 </p>
               </div>

@@ -1,13 +1,15 @@
 "use client";
 
 import React from "react";
-import { Search, ShoppingBag, X } from "lucide-react";
+import { Search, ShoppingBag, X, Sun, Moon } from "lucide-react";
 
 interface NavbarProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   cartCount: number;
   onCartClick: () => void;
+  theme: string;
+  onThemeToggle: () => void;
 }
 
 export default function Navbar({
@@ -15,51 +17,66 @@ export default function Navbar({
   setSearchQuery,
   cartCount,
   onCartClick,
+  theme,
+  onThemeToggle,
 }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/60 dark:border-zinc-800/60 bg-white/80 dark:bg-zinc-950/85 backdrop-blur-md transition-colors duration-300">
+      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         
-        {/* Brand Logo */}
-        <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 font-serif text-xl font-bold text-white shadow-lg shadow-blue-500/10">
+        {/* Brand Logo - Enlarged */}
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 font-serif text-2xl font-bold text-white shadow-lg shadow-blue-500/20">
             P
           </div>
-          <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-blue-600 bg-clip-text font-serif text-xl font-semibold tracking-wider text-transparent sm:text-2xl">
+          <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-blue-600 dark:from-zinc-50 dark:via-zinc-200 dark:to-blue-400 bg-clip-text font-serif text-2xl font-bold tracking-wider text-transparent select-none">
             PREMIUM SHOP
           </span>
         </div>
 
-        {/* Search Bar - Center */}
-        <div className="relative mx-4 hidden max-w-md flex-1 sm:block">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
+        {/* Search Bar - Center, Enlarged & Name-focused */}
+        <div className="relative mx-6 hidden max-w-lg flex-1 sm:block">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+            <Search className="h-5 w-5 text-slate-400 dark:text-zinc-500" aria-hidden="true" />
           </div>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full rounded-full border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-10 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all duration-300 focus:border-blue-500/50 focus:bg-white focus:ring-1 focus:ring-blue-500/50"
-            placeholder="Search our premium collection..."
+            className="block w-full rounded-full border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/60 py-3 pl-11 pr-12 text-sm md:text-base text-slate-900 dark:text-zinc-100 placeholder-slate-450 dark:placeholder-zinc-500 outline-none transition-all duration-300 focus:border-blue-500/60 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-blue-500/60"
+            placeholder="Search by product name..."
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600"
+              className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-zinc-300"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
           )}
         </div>
 
         {/* Right Actions */}
         <div className="flex items-center gap-4">
+          {/* Theme Toggle Button */}
+          <button
+            onClick={onThemeToggle}
+            className="rounded-full border border-slate-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/30 p-2.5 text-slate-450 dark:text-zinc-400 transition-all hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-800 dark:hover:text-zinc-100"
+            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5.5 w-5.5 text-amber-500 fill-amber-500/10" />
+            ) : (
+              <Moon className="h-5.5 w-5.5 text-blue-600 fill-blue-600/5" />
+            )}
+          </button>
+
           {/* GitHub Repo */}
           <a
-            href="https://github.com/RonaldoClindon/friendoo-monorepo"
+            href="https://github.com/RonaldoClindon/premium-store.git"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-800"
+            className="rounded-full border border-slate-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/30 p-2.5 text-slate-450 dark:text-zinc-400 transition-all hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-800 dark:hover:text-zinc-100"
             title="View Source on GitHub"
           >
             <svg className="h-5.5 w-5.5" viewBox="0 0 24 24" fill="currentColor">
@@ -70,7 +87,7 @@ export default function Navbar({
           {/* Cart Icon */}
           <button
             onClick={onCartClick}
-            className="relative rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-800"
+            className="relative rounded-full border border-slate-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/30 p-2.5 text-slate-450 dark:text-zinc-400 transition-all hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-800 dark:hover:text-zinc-100"
             title="Open Bag"
           >
             <ShoppingBag className="h-5.5 w-5.5" />
@@ -83,25 +100,25 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* Mobile Search Bar */}
+      {/* Mobile Search Bar - Enlarged */}
       <div className="px-4 pb-4 sm:hidden">
         <div className="relative w-full">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-slate-450" />
+            <Search className="h-4.5 w-4.5 text-slate-400 dark:text-zinc-500" />
           </div>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full rounded-full border border-slate-200 bg-slate-50 py-2 pl-9 pr-8 text-xs text-slate-900 placeholder-slate-400 outline-none transition-all duration-300 focus:border-blue-500/50 focus:bg-white"
-            placeholder="Search products..."
+            className="block w-full rounded-full border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/60 py-2.5 pl-10 pr-8 text-xs text-slate-900 dark:text-zinc-100 placeholder-slate-400 outline-none transition-all duration-300 focus:border-blue-500/50 focus:bg-white"
+            placeholder="Search by product name..."
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400"
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 dark:text-zinc-500"
             >
-              <X className="h-3 w-3" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
